@@ -19,9 +19,18 @@ export class ApiError extends Error {
   }
 }
 
+// ─── Environment Validation ─────────────────────────────────────────
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+if (!API_BASE_URL) {
+  throw new Error(
+    'Missing required environment variable: NEXT_PUBLIC_API_URL. ' +
+    'Copy .env.example to .env.local and configure it before starting the app.'
+  );
+}
+
 // ─── Axios Instance Setup ───────────────────────────────────────────
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

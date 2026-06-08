@@ -113,7 +113,7 @@ function DashboardContent() {
           <div className="mb-6 rounded-xl border border-red-200 bg-red-50/50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400">
             Failed to query transactions. Verify that your PostgreSQL database and NestJS backend are active at{' '}
             <code className="rounded bg-red-100 dark:bg-red-900 px-1 py-0.5 text-xs">
-              {process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000'}
+              {process.env.NEXT_PUBLIC_API_URL}
             </code>
           </div>
         )}
