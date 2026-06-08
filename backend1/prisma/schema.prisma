@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  REJECTED
+  PENDING_REVIEW
+}
+
+model Transaction {
+  id          String            @id @default(uuid()) @db.Uuid
+  amount      Decimal           @db.Decimal(18, 4)  // 18 digits, 4 decimals to support minor currency conversions or sub-cent fee precisions
+  currency    String            @db.VarChar(3)       // ISO 4217 standard 3-character currency codes (e.g., USD, EUR, GBP)
+  date        DateTime          @db.Timestamptz(3)   // Timezone-aware UTC timestamp for the transaction date
+  description String            @db.VarChar(500)     // Description capped at 500 chars to protect storage size
+  status      TransactionStatus
+
+  // Extensibility & Auditing
+  metadata    Json?             @db.JsonB            // Storing payment gateway response logs or extra API details
+  
+  // Auditing fields
+  createdAt   DateTime          @default(now())      @db.Timestamptz(3)
+  updatedAt   DateTime          @updatedAt           @db.Timestamptz(3)
+  deletedAt   DateTime?         @db.Timestamptz(3)   // Soft delete field to allow safety-recovery in financial logging
+
+  // Performance Optimization Indexes
+  @@index([date(sort: Desc)])                    // Fast sorting for standard "Recent Transactions" feeds
+  @@index([status, date(sort: Desc)])            // Optimizes the queue dashboard (filtering by status, ordering by date)
+  @@index([currency])                            // Indexing currency for aggregate calculation sorting
+  @@map("transactions")                          // Map model explicitly to pluralized lower_case table name
+}
